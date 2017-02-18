@@ -11,7 +11,6 @@ const initialState = {
     ]
 }
 
-
 export const expensesReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'ADD_EXPENSE':
