@@ -1,16 +1,14 @@
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import expense from './reducers'
+import {expensesReducer} from './reducers'
 import {Expenses} from './components'
 import React, { Component } from 'react';
 
-let store = createStore(expense);
+let store = createStore(expensesReducer);
 
 const Main = () => {
   return (
-    <Provider store={store}>
-      <Expenses />
-    </Provider>
+      <Expenses expenses={store.getState().expenses}/>
   )
 }
 

@@ -1,7 +1,23 @@
-const expense = (state = {}, action) => {
+const initialState = {
+    idGen: 1,
+    expenses: [
+        {
+            name: 'food',
+            price: 40,
+            category: 'food',
+            date: new Date().toDateString(),
+            id: 1
+        }
+    ]
+}
+
+
+export const expensesReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'ADD_EXPENSE':
+            const nextId = state.idGen + 1;
             return Object.assign({}, state, {
+                idGen: nextId,
                 expenses: [
                     ...state.expenses,
                     {
@@ -9,14 +25,14 @@ const expense = (state = {}, action) => {
                         price: action.price,
                         category: action.category,
                         date: action.date,
-                        id: nextExpense
+                        id: nextId
                     }
                 ]
             });
         case 'REMOVE_EXPENSE':
             return Object.assign({}, state, {
-                expenses: state.expenses.map((expense, index) => {
-                    if (index !== action.index) {
+                expenses: state.expenses.map((expense) => {
+                    if (expenses.id !== action.id) {
                         return expense;
                     }
                 })
@@ -25,5 +41,3 @@ const expense = (state = {}, action) => {
             return state;
     }
 }
-
-export default expense;

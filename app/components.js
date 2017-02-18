@@ -1,36 +1,33 @@
 import React, {PropTypes} from 'react';
-import {
-  Text,
-  View
-} from 'react-native';
+import {Text, View} from 'react-native';
 
 const Expense = ({name, price, category, date}) => (
     <View>
-      <Text>{name}, </Text><Text>{price},</Text><Text>{category},</Text><Text>{date}</Text>
+      <Text>What: {name}, How much: {price}, Category: {category}, When: {date}</Text>
     </View>
 )
 
-// Expense.propTypes = {
-//     onClick: PropTypes.func.isRequired,
-//     name: PropTypes.string.isRequired,
-//     price: PropTypes.string.isRequired,
-//     category: PropTypes.string.isRequired,
-//     date: PropTypes.string.isRequired
-// }
-//
-export const Expenses = ({expenses = [{name: 'bar', price: '123', category:'foo', date: 'today', id: 7}]}) => (
+Expense.propTypes = {
+    name: PropTypes.string.isRequired,
+    price: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired
+}
+
+export const Expenses = ({expenses}) => (
     <View>
-        <Expense key={expenses[0].id} {...expenses[0]}/>
+          {expenses.map(expense =>
+              <Expense key={expense.id} {...expense} />
+          )}
     </View>
 )
 
-// Expenses.propTypes = {
-//     onExpenseClick: PropTypes.func.isRequired,
-//     expenses: PropTypes.arrayOf(PropTypes.shape({
-//       id: PropTypes.number.isRequired,
-//       nname: PropTypes.string.isRequired,
-//       price: PropTypes.string.isRequired,
-//       category: PropTypes.string.isRequired,
-//       date: PropTypes.string.isRequired
-//     }).isRequired).isRequired,
-// }
+Expenses.propTypes = {
+    expenses: PropTypes.arrayOf(PropTypes.shape({
+        category: PropTypes.string.isRequired,
+        date: PropTypes.string.isRequired,
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+    }).isRequired).isRequired,
+}
