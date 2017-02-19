@@ -1,7 +1,8 @@
 import React, {PropTypes} from 'react';
 import {Text, View, Button} from 'react-native';
 
-export const Expense = ({name, price, category, date, onPress}) => (
+export
+    const Expense = ({name, price, category, date, onPress}) => (
     <View>
       <Text>What: {name}, How much: {price}, Category: {category}, When: {date}</Text>
       <Button onPress={onPress} title="-" />

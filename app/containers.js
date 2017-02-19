@@ -1,29 +1,40 @@
 import React, {PropTypes, Component} from 'react';
 import {Text, View, Button, TextInput} from 'react-native';
 import {Expense} from './components';
+import {addExpense, removeExpense} from './actions';
 
-export const ExpensesList = ({expenses=[], onExpensePress}) => (
-    <View>
-        {expenses.map(expense =>
-          <Expense key={expense.id} {...expense} onPress={() => onExpensePress(expense.id)}/>
-        )}
-    </View>
-)
+export class ExpensesList extends Component {
+    componentDidMount() {
+        const {store} = this.context;
+        this.unsubcribe = store.subscribe(() => this.forceUpdate());
+    }
 
-ExpensesList.propTypes = {
-    expenses: PropTypes.arrayOf(PropTypes.shape({
-        category: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-    }).isRequired).isRequired,
-    onExpensePress: PropTypes.func.isRequired
+    componentWillUnmount() {
+        this.unsubcribe();
+    }
+
+    render() {
+        const {store} = this.context;
+
+        return (
+            <View>
+                {store.getState().expenses.map(expense =>
+                  <Expense key={expense.id} {...expense} onPress={() => {
+                      store.dispatch(removeExpense(expense.id));
+                  }}/>
+                )}
+            </View>
+        )
+    }
+}
+
+ExpensesList.contextTypes = {
+    store: PropTypes.object
 }
 
 export class AddExpenseForm extends Component {
-    constructor(props) {
-        super(props);
+    constructor(props, context) {
+        super(props, context);
 
         this.state = {
             name: '',
@@ -57,12 +68,14 @@ export class AddExpenseForm extends Component {
 
                 <Button
                     onPress={() => {
-                        this.props.onPress({
+                        const {store} = this.context;
+
+                        store.dispatch(addExpense({
                             name: this.state.name,
-                            price: parseInt(this.state.price) || 0,
-                            category: this.state.category,
+                            price: this.state.price,
+                            category: this.state.price,
                             date: new Date().toDateString()
-                        });
+                        }));
 
                         this.refs.name.clear();
                         this.refs.price.clear();
@@ -75,6 +88,6 @@ export class AddExpenseForm extends Component {
     }
 }
 
-AddExpenseForm.propTypes = {
-    onPress: PropTypes.func.isRequired
+AddExpenseForm.contextTypes = {
+    store: PropTypes.object
 }
