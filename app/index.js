@@ -1,9 +1,9 @@
-import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import {expensesReducer} from './reducers'
-import {Expenses} from './components'
+import {Expenses, AddExpense} from './components'
 import React from 'react';
-import {addExpense} from './actions';
+import {addExpense, removeExpense} from './actions';
+import {View} from 'react-native';
 
 const store = createStore(expensesReducer);
 
@@ -18,7 +18,11 @@ export class MobileHajs extends React.Component {
 
   componentDidMount() {
     this.updateState()
-    store.subscribe(this.updateState.bind(this));
+    this.unsubcribe = store.subscribe(this.updateState.bind(this));
+  }
+
+  componentWillUnmount() {
+    this.unsubcribe();
   }
 
   updateState() {
@@ -29,9 +33,16 @@ export class MobileHajs extends React.Component {
     store.dispatch(addExpense(expense));
   }
 
+  removeExpense(id) {
+    store.dispatch(removeExpense(id));
+  }
+
   render() {
     return(
-        <Expenses expenses={this.state.expenses} onAddExpenseClick={this.addExpense.bind(this)}/>
+      <View>
+        <Expenses expenses={this.state.expenses} onExpensePress={this.removeExpense.bind(this)}/>
+        <AddExpense onPress={this.addExpense.bind(this)} />
+      </View>
     )
   }
 }

@@ -4,13 +4,14 @@ export const addExpense = (expense) => {
         name: expense.name,
         price: expense.price,
         category: expense.category,
-        date: expense.date
+        date: expense.date,
+        id: expense.id
     }
 }
 
-export const removeExpenses = (index) => {
+export const removeExpense = (id) => {
     return {
         type: 'REMOVE_EXPENSE',
-        index
+        id
     }
 }

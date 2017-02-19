@@ -30,12 +30,8 @@ export const expensesReducer = (state = initialState, action) => {
             });
         case 'REMOVE_EXPENSE':
             return Object.assign({}, state, {
-                expenses: state.expenses.map((expense) => {
-                    if (expenses.id !== action.id) {
-                        return expense;
-                    }
-                })
-            })
+                    expenses: state.expenses.filter((expense) => (expense.id !== action.id))
+                });
         default:
             return state;
     }
