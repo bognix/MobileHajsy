@@ -1,6 +1,6 @@
 import { createStore } from 'redux'
 import {expensesReducer} from './reducers'
-import {Expenses, AddExpense} from './components'
+import {ExpensesList, AddExpenseForm} from './containers'
 import React from 'react';
 import {addExpense, removeExpense} from './actions';
 import {View} from 'react-native';
@@ -40,8 +40,8 @@ export class MobileHajs extends React.Component {
   render() {
     return(
       <View>
-        <Expenses expenses={this.state.expenses} onExpensePress={this.removeExpense.bind(this)}/>
-        <AddExpense onPress={this.addExpense.bind(this)} />
+        <ExpensesList expenses={this.state.expenses} onExpensePress={this.removeExpense.bind(this)}/>
+        <AddExpenseForm onPress={this.addExpense.bind(this)} />
       </View>
     )
   }
