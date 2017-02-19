@@ -1,10 +1,10 @@
 import React, {PropTypes} from 'react';
 import {Text, View, Button, TextInput} from 'react-native';
 
-const Expense = ({name, price, category, date, onPress, id}) => (
+const Expense = ({name, price, category, date, onPress}) => (
     <View>
       <Text>What: {name}, How much: {price}, Category: {category}, When: {date}</Text>
-      <Button onPress={() => onPress(id)} title="-" />
+      <Button onPress={onPress} title="-" />
     </View>
 )
 
@@ -18,7 +18,7 @@ Expense.propTypes = {
 export const Expenses = ({expenses=[], onExpensePress}) => (
     <View>
         {expenses.map(expense =>
-          <Expense key={expense.id} {...expense} onPress={onExpensePress}/>
+          <Expense key={expense.id} {...expense} onPress={() => onExpensePress(expense.id)}/>
         )}
     </View>
 )
