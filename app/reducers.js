@@ -1,5 +1,4 @@
 const initialState = {
-    idGen: 1,
     expenses: [
         {
             name: 'food',
@@ -14,9 +13,7 @@ const initialState = {
 export const expensesReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'ADD_EXPENSE':
-            const nextId = state.idGen + 1;
             return Object.assign({}, state, {
-                idGen: nextId,
                 expenses: [
                     ...state.expenses,
                     {
@@ -24,7 +21,6 @@ export const expensesReducer = (state = initialState, action) => {
                         price: action.price,
                         category: action.category,
                         date: action.date,
-                        id: nextId
                     }
                 ]
             });

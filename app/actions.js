@@ -1,3 +1,5 @@
+let nextTodoId = 0;
+
 export const addExpense = (expense) => {
     return {
         type: 'ADD_EXPENSE',
@@ -5,7 +7,7 @@ export const addExpense = (expense) => {
         price: expense.price,
         category: expense.category,
         date: expense.date,
-        id: expense.id
+        id: nextTodoId++
     }
 }
 
