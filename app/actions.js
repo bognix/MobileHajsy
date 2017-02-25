@@ -17,3 +17,11 @@ export const removeExpense = (id) => {
         id
     }
 }
+
+export const logIn = () => ({
+    type: 'USER_LOGIN'
+})
+
+export const logOut = () => ({
+    type: 'USER_LOGOUT'
+})

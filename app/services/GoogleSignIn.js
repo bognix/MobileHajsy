@@ -1,22 +1,9 @@
-import React, {
-    Component,
-    PropTypes
-} from 'react';
+import React from 'react';
+import {DeviceEventEmitter, NativeModules} from 'react-native';
+import Config from 'react-native-config';
 
-import {
-    View,
-    DeviceEventEmitter,
-    NativeModules,
-    requireNativeComponent,
-} from 'react-native';
-
-import Config from 'react-native-config'
-
-const GoogleSignInNative = NativeModules.GoogleSignIn;
-
-
-class GoogleSignInClass {
-
+export const GoogleSignInNative = NativeModules.GoogleSignIn;
+export class GoogleSignIn {
     constructor() {
         this._user = null;
     }
@@ -27,9 +14,11 @@ class GoogleSignInClass {
         return GoogleSignInNative.playServicesAvailable(params.autoResolve);
     }
 
-    configure(params = {}) {
+    configure(offlineAccess = false) {
         params = [
-            params.scopes || [], params.webClientId || null, params.offlineAccess || false
+            ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/userinfo.profile'] || [],
+            Config.WEB_CLIENT_ID || null,
+            offlineAccess
         ];
 
         return GoogleSignInNative.configure(...params);
@@ -39,7 +28,6 @@ class GoogleSignInClass {
         return new Promise((resolve, reject) => {
             const sucessCb = DeviceEventEmitter.addListener('GoogleSignInSilentSuccess', (user) => {
                 this._user = user;
-                console.log(user);
                 GoogleSignInNative.getAccessToken(user)
                     .then((token) => {
                         this._user.accessToken = token;
@@ -126,59 +114,5 @@ class GoogleSignInClass {
 
     _removeListeners(...listeners) {
         listeners.forEach(lt => lt.remove());
-    }
-}
-
-export const GoogleSignIn = new GoogleSignInClass();
-
-const GoogleSignInButtonNative = requireNativeComponent('GoogleSignInButton', {
-    name: 'GoogleSignInButtonNative',
-    propTypes: {
-        ...View.propTypes,
-        size: PropTypes.number,
-        color: PropTypes.number
-    }
-});
-
-export class GoogleSignInButton extends Component {
-    componentDidMount() {
-        GoogleSignIn.configure({
-                scopes: ['https://www.googleapis.com/auth/calendar'],
-                webClientId: Config.WEB_CLIENT_ID,
-            });
-
-        this._clickListener = DeviceEventEmitter.addListener('GoogleSignInButtonClicked', () => {
-            this.props.onPress && this.props.onPress();
-        });
-    }
-
-    componentWillUnmount() {
-        this._clickListener && this._clickListener.remove();
-    }
-
-    render() {
-        return (
-            <GoogleSignInButtonNative { ...this.props} />
-        );
-    }
-}
-
-GoogleSignInButton.Size = {
-    Icon: GoogleSignInNative.BUTTON_SIZE_ICON,
-    Standard: GoogleSignInNative.BUTTON_SIZE_STANDARD,
-    Wide: GoogleSignInNative.BUTTON_SIZE_WIDE
-};
-
-GoogleSignInButton.Color = {
-    Auto: GoogleSignInNative.BUTTON_COLOR_AUTO,
-    Light: GoogleSignInNative.BUTTON_COLOR_LIGHT,
-    Dark: GoogleSignInNative.BUTTON_COLOR_DARK
-};
-
-class GoogleSignInError extends Error {
-    constructor(error, code) {
-        super(error);
-        this.name = 'GoogleSignInError';
-        this.code = code;
     }
 }

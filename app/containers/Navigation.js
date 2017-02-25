@@ -1,31 +1,23 @@
-import {
-    GoogleSignIn,
-    GoogleSignInButton
-} from '../components/GoogleSignIn';
 import React from 'react';
+import {connect} from 'react-redux';
+import {UserMenu} from '../components/UserMenu';
+import {logIn} from '../actions';
+import {GoogleSignIn} from '../services/GoogleSignIn';
 
+const mapStateToProps = (state) => ({
+    loggedIn: state.loggedIn
+});
 
-export const Navigation = () => ( <
-    GoogleSignInButton style = {
-        {
-            width: 48,
-            height: 48
-        }
+const mapDispatchToProps = (dispatch) => ({
+    onLoginPress: () => {
+        const googleSignInService = new GoogleSignIn();
+
+        googleSignInService.configure().
+            then(() => {
+                googleSignInService.signIn()
+            }).
+            then(() => dispatch(logIn(true)));
     }
-    size = {
-        GoogleSignInButton.Size.Icon
-    }
-    color = {
-        GoogleSignInButton.Color.Light
-    }
-    onPress = {
-        () => {
-            GoogleSignIn.signIn()
-                .catch((err) => {
-                    console.log('WRONG SIGNIN', err);
-                })
-                .done();
-        }
-    }
-    />
-);
+})
+
+export const Navigation = connect(mapStateToProps, mapDispatchToProps)(UserMenu);
