@@ -19,12 +19,22 @@ const expensesReducer = (state = [], action) => {
     }
 }
 
-const userLoginReducer = (state = false, action) => {
+const userLoginReducer = (state = {}, action) => {
     switch (action.type) {
         case 'USER_LOGIN':
-            return true;
+            return Object.assign({}, state, {
+                loggedIn: true,
+                avatar: action.avatar,
+                name: action.name,
+                token: action.token
+            });
         case 'USER_LOGOUT':
-            return false;
+            return Object.assign({}, state, {
+                loggedIn: false,
+                avatar: '',
+                name: '',
+                token: ''
+            });
         default:
             return state
     }
@@ -32,5 +42,5 @@ const userLoginReducer = (state = false, action) => {
 
 export const mobileHajs = combineReducers({
     expenses: expensesReducer,
-    loggedIn: userLoginReducer
+    user: userLoginReducer
 });

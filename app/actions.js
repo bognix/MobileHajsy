@@ -18,10 +18,17 @@ export const removeExpense = (id) => {
     }
 }
 
-export const logIn = () => ({
-    type: 'USER_LOGIN'
-})
+export const logIn = (user) => {
+    return {
+        type: 'USER_LOGIN',
+        loggedIn: true,
+        name: user.name,
+        token: user.accessToken,
+        avatar: user.photo
+    }
+}
 
 export const logOut = () => ({
-    type: 'USER_LOGOUT'
+    type: 'USER_LOGOUT',
+    loggedIn: false
 })

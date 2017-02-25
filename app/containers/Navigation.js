@@ -4,9 +4,11 @@ import {UserMenu} from '../components/UserMenu';
 import {logIn} from '../actions';
 import {GoogleSignIn} from '../services/GoogleSignIn';
 
-const mapStateToProps = (state) => ({
-    loggedIn: state.loggedIn
-});
+const mapStateToProps = (state) => {
+    return {
+            user: state.user
+    }
+}
 
 const mapDispatchToProps = (dispatch) => ({
     onLoginPress: () => {
@@ -14,9 +16,11 @@ const mapDispatchToProps = (dispatch) => ({
 
         googleSignInService.configure().
             then(() => {
-                googleSignInService.signIn()
+                return googleSignInService.signIn();
             }).
-            then(() => dispatch(logIn(true)));
+            then((user) => {
+                dispatch(logIn(user));
+            });
     }
 })
 
