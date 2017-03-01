@@ -32,3 +32,8 @@ export const logOut = () => ({
     type: 'USER_LOGOUT',
     loggedIn: false
 })
+
+export const changeCategory = (category) => (
+    type: 'CATEGORY_CHANGE',
+    category
+)

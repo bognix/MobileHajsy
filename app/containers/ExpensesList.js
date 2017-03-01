@@ -3,8 +3,16 @@ import {connect} from 'react-redux';
 import {ExpensesList} from '../components/ExpensesList';
 import {removeExpense} from '../actions';
 
+const getVisibleExpenses = (expenses, category) => {
+    if (category) {
+        return expenses.filter((expense) => expense.category.indexOf(category) === 0);
+    }
+
+    return expenses;
+}
+
 const mapStateToProps = (state) => ({
-    expenses: state.expenses
+    expenses: getVisibleExpenses(state.expenses, state.category)
 });
 
 const mapDispatchToProps = (dispatch) => ({

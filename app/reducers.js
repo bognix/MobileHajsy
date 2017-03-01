@@ -13,7 +13,16 @@ const expensesReducer = (state = [], action) => {
                     }
                 ];
         case 'REMOVE_EXPENSE':
-            return state.expenses.filter((expense) => (expense.id !== action.id));
+            return state.filter((expense) => (expense.id !== action.id));
+        default:
+            return state;
+    }
+}
+
+const categoryFilterReducer = (state = '', action) => {
+    switch (action.type) {
+        case 'CATEGORY_CHANGE':
+            return action.category;
         default:
             return state;
     }
@@ -42,5 +51,6 @@ const userLoginReducer = (state = {}, action) => {
 
 export const mobileHajs = combineReducers({
     expenses: expensesReducer,
-    user: userLoginReducer
+    user: userLoginReducer,
+    category: categoryFilterReducer
 });

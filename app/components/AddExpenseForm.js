@@ -43,7 +43,7 @@ export class AddExpenseForm extends Component {
                         dispatch(addExpense({
                             name: this.state.name,
                             price: this.state.price,
-                            category: this.state.price,
+                            category: this.state.category,
                             date: new Date().toDateString()
                         }));
 
