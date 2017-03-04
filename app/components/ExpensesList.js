@@ -22,7 +22,7 @@ export const ExpensesList = ({expenses, onPress}) => (
           <Expense key={expense.id} {...expense} onPress={() => onPress(expense.id)} />
         )}
     </View>
-)
+);
 
 Expense.propTypes = {
     expenses: PropTypes.arrayOf(PropTypes.shape({

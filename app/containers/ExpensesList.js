@@ -11,14 +11,18 @@ const getVisibleExpenses = (expenses, category) => {
     return expenses;
 }
 
-const mapStateToProps = (state) => ({
-    expenses: getVisibleExpenses(state.expenses, state.category)
-});
+const mapStateToProps = (state) => {
+    return {
+        expenses: getVisibleExpenses(state.expenses.list, state.category),
+        loading: state.expenses.loading,
+        error: state.expenses.error
+    }
+};
 
 const mapDispatchToProps = (dispatch) => ({
     onPress: (id) => {
         dispatch(removeExpense(id));
     }
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExpensesList);
