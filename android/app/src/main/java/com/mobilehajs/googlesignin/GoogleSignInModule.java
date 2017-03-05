@@ -1,5 +1,6 @@
 package com.mobilehajs.googlesignin;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,8 +16,9 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
@@ -28,16 +30,14 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +48,8 @@ public class GoogleSignInModule extends ReactContextBaseJavaModule implements Ac
     public static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private String userEmail;
+    private ReadableArray userScopes;
 
     public GoogleSignInModule(final ReactApplicationContext reactContext) {
         super(reactContext);
@@ -138,6 +140,8 @@ public class GoogleSignInModule extends ReactContextBaseJavaModule implements Ac
                             params.putString("email", user.getEmail());
                             params.putString("photo", photoUrl != null ? photoUrl.toString() : null);
 
+                            userEmail = user.getEmail();
+
                             getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                                     .emit("GoogleSignInSuccess" , params);
                         } else {
@@ -199,18 +203,20 @@ public class GoogleSignInModule extends ReactContextBaseJavaModule implements Ac
 
     @ReactMethod
     public void getAccessToken(final Promise promise) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        user.getToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
-            @Override
-            public void onSuccess(GetTokenResult getTokenResult) {
-                promise.resolve(getTokenResult.getToken());
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                promise.reject("GET_ACCESS_TOKEN", e.getMessage());
-            }
-        });
+        try {
+            promise.resolve(GoogleAuthUtil.getToken(getReactApplicationContext(), new Account(userEmail, "com.google"), scopesToString()));
+        } catch (IOException | GoogleAuthException e) {
+            e.printStackTrace();
+            promise.reject(e);
+        }
+    }
+
+    private  String  scopesToString() {
+        String temp ="oauth2:";
+        for (int i = 0; i < userScopes.size(); i++) {
+            temp += userScopes.getString(i)+" ";
+        }
+        return temp.trim();
     }
 
     private void emitError(String eventName, int code, String error) {
@@ -235,6 +241,8 @@ public class GoogleSignInModule extends ReactContextBaseJavaModule implements Ac
                     }
                 }
             }
+
+            userScopes = scopes;
         }
 
         if (webClientId != null && !webClientId.isEmpty()) {
@@ -263,8 +271,7 @@ public class GoogleSignInModule extends ReactContextBaseJavaModule implements Ac
         WritableMap params = Arguments.createMap();
 
         if (result.isSuccess()) {
-            GoogleSignInAccount acct = result.getSignInAccount();
-            AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+            AuthCredential credential = GoogleAuthProvider.getCredential(result.getSignInAccount().getIdToken(), null);
 
             mAuth.signInWithCredential(credential)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
