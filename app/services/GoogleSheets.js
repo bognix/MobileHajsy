@@ -1,7 +1,11 @@
+import {serializeExpenses} from '../serializers/googleSheetsSerializer';
+
 export default class GoogleSheets {
 
     constructor() {
         this.existingSheets = [];
+        //TODO this should be configurable
+        this.range = 'A:E';
     }
 
     configure({spreadSheetId, token}) {
@@ -30,6 +34,10 @@ export default class GoogleSheets {
             requestConfig.body = body;
         }
 
+        if (!path && path !== '') {
+            path =  '';
+        }
+
         // Path has to start with `/` if it's expected
         return new Request(`https://sheets.googleapis.com/v4/spreadsheets/${this.spreadSheetId}${path}`, requestConfig);
     }
@@ -49,12 +57,10 @@ export default class GoogleSheets {
                     return reject(response.json());
                 })
                 .then((spreadSheetData) => {
-                    console.log(spreadSheetData);
-                    this.existingSheets = spreadSheetData.sheets;
-                    resolve(existingSheets);
+                    resolve(this.existingSheets);
                 })
                 .catch((err) => {
-                    console.log("ERROR", err)
+                    reject(err);
                 });
         });
     }
@@ -64,7 +70,7 @@ export default class GoogleSheets {
 
             this._getSheets()
                 .then(() => fetch(this._createRequest({
-                    path: `/values/${sheetID}!${range}`
+                    path: `/values/${sheetID}!${this.range}`
                 })))
                 .then((response) => {
                     if (response.ok) {
@@ -74,11 +80,10 @@ export default class GoogleSheets {
                     return reject(response.status);
                 })
                 .then((data) => {
-                    resolve(data);
+                    return resolve(serializeExpenses(data));
                 })
                 .catch((err) => {
-                    err.then((err) => console.log("ERROR 2", err))
-                    reject(err);
+                    return reject(err);
                 });
         });
     }

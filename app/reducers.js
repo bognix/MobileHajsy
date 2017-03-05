@@ -27,10 +27,9 @@ const expensesReducer = (expenses = initialState.expenses, action) => {
             list: expenses.list
         }
     case `${FETCH_SPREADSHEET_DATA}_FULFILLED`:
-        console.log("FULFILLED", action);
         return {
             loading: false,
-            list: action.data
+            list: action.payload
         }
     case `${FETCH_SPREADSHEET_DATA}_REJECTED`:
         console.log("REJECTED", action);
