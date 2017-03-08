@@ -1,6 +1,6 @@
 import React, {PropTypes, Component} from 'react';
 import {Text, View, Button, TextInput} from 'react-native';
-import {addExpense} from '../actions';
+import {addExpenseAsync} from '../actions';
 
 export class AddExpenseForm extends Component {
     constructor(props) {
@@ -40,7 +40,7 @@ export class AddExpenseForm extends Component {
                     onPress={() => {
                         const {dispatch} = this.props;
 
-                        dispatch(addExpense({
+                        dispatch(addExpenseAsync({
                             name: this.state.name,
                             price: this.state.price,
                             category: this.state.category,

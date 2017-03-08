@@ -1,9 +1,10 @@
-import {serializeExpenses} from '../serializers/googleSheetsSerializer';
+import {serializeExpenses, serializeExpense} from '../serializers/googleSheetsSerializer';
+import {generateRandomInt} from '../utils/random';
 
 const existingSheets = [];
 const range = 'A:E';
 
-function _createRequest({
+function createRequest({
     method = 'get',
     body = null,
     path,
@@ -34,13 +35,13 @@ function _createRequest({
     return new Request(`https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}${path}`, requestConfig);
 }
 
-function _getSheets(requestProps) {
+function getSheets(requestProps) {
     return new Promise((resolve, reject) => {
         if (existingSheets.length > 0) {
             return resolve(existingSheets);
         }
 
-        return fetch(_createRequest(requestProps))
+        return fetch(createRequest(requestProps))
             .then((response) => {
                 if (response.ok) {
                     return response.json();
@@ -60,8 +61,8 @@ function _getSheets(requestProps) {
 export function getAll({sheetName, ...requestProps}) {
     return new Promise((resolve, reject) => {
 
-        _getSheets(requestProps)
-            .then(() => fetch(_createRequest({
+        getSheets(requestProps)
+            .then(() => fetch(createRequest({
                 path: `/values/${sheetName}!${range}`,
                 ...requestProps
             })))
@@ -78,5 +79,73 @@ export function getAll({sheetName, ...requestProps}) {
             .catch((err) => {
                 return reject(err);
             });
+    });
+}
+
+export function addRow (expense, {sheetName, ...requestProps}) {
+   return new Promise((resolve, reject) => {
+       createSheet(sheetName, requestProps).
+               then(() => fetch(createRequest({
+                   method: 'post',
+                   path: `/values/${sheetName}!${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+                   body: JSON.stringify({
+                       values: serializeExpense(expense)
+                   }),
+                   ...requestProps
+               }))).
+               then((response) => {
+                   if (response.ok) {
+                       resolve();
+                   }
+
+                   return reject(response.status);
+               }).
+               catch((err) => {
+                   reject(err);
+               });
+   });
+}
+
+function buildCreateSheetRequest (properties) {
+    return {
+        path: ':batchUpdate',
+        body: JSON.stringify({
+            requests: [
+                {
+                    "addSheet": {
+                        "properties": {
+                            sheetId: generateRandomInt(),
+                            title: properties.sheetTitle,
+                            hidden: false
+                        }
+                    }
+                }],
+            "includeSpreadsheetInResponse": false,
+            "responseRanges": [
+                range
+            ],
+            "responseIncludeGridData": false
+        }),
+        method: 'post'
+    };
+}
+
+function createSheet (sheetName, requestProps) {
+    const sheetToFetch = existingSheets.find((sheet) => sheet.properties.title === sheetName);
+
+    return new Promise((resolve) => {
+        if (sheetToFetch) {
+            resolve();
+        } else {
+            existingSheets.push({
+                properties: {
+                    title: sheetName
+                }
+            });
+
+            fetch(createRequest(buildCreateSheetRequest({
+                sheetTitle: sheetName
+            }), requestProps)).then(resolve);
+        }
     });
 }

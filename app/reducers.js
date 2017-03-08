@@ -6,14 +6,16 @@ import {
     REMOVE_EXPENSE,
     CATEGORY_CHANGE,
     USER_LOGIN,
-    FETCH_SPREADSHEET_DATA
+    FETCH_SPREADSHEET_DATA,
+    ADD_EXPENSE_ASYNC
 } from './constants';
+
+import {generateRandomInt} from './utils/random';
 
 const initialState = {
     expenses: {
         list: [],
-        loading: false,
-        error: false
+        loading: false
     },
     user: {},
     category: ''
@@ -37,22 +39,31 @@ const expensesReducer = (expenses = initialState.expenses, action) => {
             list: []
         }
 
-    case ADD_EXPENSE:
-        return Object.assign(
-            {},
-            expenses,
-            {
-                list: [
-                    ...expenses.list,
-                    {
-                        name: action.name,
-                        price: action.price,
-                        category: action.category,
-                        date: action.date,
-                    }
-                ]
-            }
-        );
+    case `${ADD_EXPENSE_ASYNC}_PENDING`:
+        return {
+            loading: true,
+            list: [
+                ...expenses.list,
+                {
+                    name: action.payload.name,
+                    price: action.payload.price,
+                    category: action.payload.category,
+                    date: action.payload.date,
+                    id: generateRandomInt()
+                }
+            ]
+        }
+    case `${ADD_EXPENSE_ASYNC}_FULFILLED`:
+        return {
+            ...expenses,
+            loading: false
+        }
+    case `${ADD_EXPENSE_ASYNC}_REJECTED`:
+        return {
+            ...expenses,
+            loading: false
+        }
+
     case REMOVE_EXPENSE:
         return Object.assign(
             {},
