@@ -1,90 +1,82 @@
 import {serializeExpenses} from '../serializers/googleSheetsSerializer';
 
-export default class GoogleSheets {
+const existingSheets = [];
+const range = 'A:E';
 
-    constructor() {
-        this.existingSheets = [];
-        //TODO this should be configurable
-        this.range = 'A:E';
+function _createRequest({
+    method = 'get',
+    body = null,
+    path,
+    token,
+    spreadSheetId
+} = {}) {
+    const authHeader = `Bearer ${token}`,
+        requestConfig = {
+            method,
+            token,
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': authHeader
+            },
+            mode: 'cors',
+            cache: 'default'
+        };
+
+    if (body && method === 'post') {
+        requestConfig.body = body;
     }
 
-    configure({spreadSheetId, token}) {
-        this.spreadSheetId = spreadSheetId;
-        this.token = token;
+    if (!path && path !== '') {
+        path =  '';
     }
 
-    _createRequest({
-        method = 'get',
-        body = null,
-        path
-    } = {}) {
-        const authHeader = `Bearer ${this.token}`,
-            requestConfig = {
-                method,
-                token: this.token,
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    'Authorization': authHeader
-                },
-                mode: 'cors',
-                cache: 'default'
-            };
+    // Path has to start with `/` if it's expected
+    return new Request(`https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}${path}`, requestConfig);
+}
 
-        if (body && method === 'post') {
-            requestConfig.body = body;
+function _getSheets(requestProps) {
+    return new Promise((resolve, reject) => {
+        if (existingSheets.length > 0) {
+            return resolve(existingSheets);
         }
 
-        if (!path && path !== '') {
-            path =  '';
-        }
+        return fetch(_createRequest(requestProps))
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
 
-        // Path has to start with `/` if it's expected
-        return new Request(`https://sheets.googleapis.com/v4/spreadsheets/${this.spreadSheetId}${path}`, requestConfig);
-    }
+                return reject(response.json());
+            })
+            .then((spreadSheetData) => {
+                resolve(existingSheets);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+}
 
-    _getSheets() {
-        return new Promise((resolve, reject) => {
-            if (this.existingSheets.length > 0) {
-                return resolve(existingSheets);
-            }
+export function getAll({sheetName, ...requestProps}) {
+    return new Promise((resolve, reject) => {
 
-            return fetch(this._createRequest())
-                .then((response) => {
-                    if (response.ok) {
-                        return response.json();
-                    }
+        _getSheets(requestProps)
+            .then(() => fetch(_createRequest({
+                path: `/values/${sheetName}!${range}`,
+                ...requestProps
+            })))
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
 
-                    return reject(response.json());
-                })
-                .then((spreadSheetData) => {
-                    resolve(this.existingSheets);
-                })
-                .catch((err) => {
-                    reject(err);
-                });
-        });
-    }
-
-    getAll(sheetID) {
-        return new Promise((resolve, reject) => {
-
-            this._getSheets()
-                .then(() => fetch(this._createRequest({
-                    path: `/values/${sheetID}!${this.range}`
-                })))
-                .then((response) => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-
-                    return reject(response.status);
-                })
-                .then((data) => {
-                    return resolve(serializeExpenses(data));
-                })
-                .catch((err) => {
-                    return reject(err);
-                });
-        });
-    }
+                return reject(response.status);
+            })
+            .then((data) => {
+                return resolve(serializeExpenses(data));
+            })
+            .catch((err) => {
+                return reject(err);
+            });
+    });
 }

@@ -5,8 +5,7 @@ import {
     CATEGORY_CHANGE,
     FETCH_SPREADSHEET_DATA
 } from './constants';
-
-let nextTodoId = 0;
+import {getAll} from './services/GoogleSheets';
 
 export const addExpense = (expense) => ({
     type: ADD_EXPENSE,
@@ -24,6 +23,11 @@ export const removeExpense = (id) => {
     }
 }
 
+export const changeCategory = (category) => ({
+    type: CATEGORY_CHANGE,
+    category
+});
+
 export const logIn = (user) => {
     return {
         type: USER_LOGIN,
@@ -34,14 +38,22 @@ export const logIn = (user) => {
     }
 }
 
-export const changeCategory = (category) => ({
-    type: CATEGORY_CHANGE,
-    category
-});
-
-export const fetchSpreadSheetData = (promise) => {
+export const fetchSpreadSheetData = (props) => {
     return {
         type: FETCH_SPREADSHEET_DATA,
-        payload: promise
+        payload: getAll(props)
     }
 };
+
+export const logInAndFetchData = (user) => {
+    const sheetName = '03-2017-spendings';
+    const spreadSheetId = '1kk2x5fZ6TyhX_o8nNKILEnuU2LZ4L3QGgeQTRBtXTfI';
+
+    return (dispatch, getState) => {
+        //TODO logIn should be async
+        dispatch(logIn(user));
+        const {user: {token}} = getState();
+
+        dispatch(fetchSpreadSheetData({token, spreadSheetId, sheetName}));
+    }
+}

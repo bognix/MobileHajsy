@@ -8,9 +8,11 @@ import React from 'react';
 import {View} from 'react-native';
 import {Provider} from 'react-redux';
 import promiseMiddleware from 'redux-promise-middleware';
+import thunk from 'redux-thunk';
 
 composeStoreWithMiddleware = applyMiddleware(
-  promiseMiddleware()
+  promiseMiddleware(),
+  thunk
 )(createStore);
 
 export const MobileHajs = () => (
