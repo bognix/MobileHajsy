@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {ExpensesList} from '../components/ExpensesList';
-import {removeExpense} from '../actions';
+import {removeExpenseAsync} from '../actions';
 
 const getVisibleExpenses = (expenses, category) => {
     if (category) {
@@ -20,7 +20,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
     onPress: (id) => {
-        dispatch(removeExpense(id));
+        dispatch(removeExpenseAsync(id));
     }
 });
 

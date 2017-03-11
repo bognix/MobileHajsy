@@ -1,6 +1,6 @@
 import {generateRandomInt} from '../utils/random';
 
-export const serializeExpenses = (payload = {}) => {
+export const deserializeExpenses = (payload = {}) => {
     const {values} = payload;
 
     return values.map((entry) => {
@@ -14,9 +14,8 @@ export const serializeExpenses = (payload = {}) => {
     });
 }
 
-export const serializeExpense = (expense = {}) => {
-    // yes, it's array of arrays
-    return [
-        [expense.name, expense.price, expense.category, expense.date]
-    ];
-}
+export const serializeExpense = (expense = {}) => ([destructExpense(expense)]);
+
+export const serializeExpenses = (expenses = []) => (expenses.map((expense) => destructExpense(expense)));
+
+const destructExpense = (expense) => ([expense.name, expense.price, expense.category, expense.date]);

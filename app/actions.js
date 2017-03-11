@@ -1,32 +1,16 @@
 import {
-    ADD_EXPENSE,
-    REMOVE_EXPENSE,
     USER_LOGIN,
     CATEGORY_CHANGE,
     FETCH_SPREADSHEET_DATA,
-    ADD_EXPENSE_ASYNC
+    ADD_EXPENSE_ASYNC,
+    REMOVE_EXPENSE_ASYNC
 } from './constants';
 import {
     getAll,
-    addRow
+    addRow,
+    replaceAllRows
 } from './services/GoogleSheets';
 import { GoogleSignIn } from './services/GoogleSignIn';
-
-export const addExpense = (expense) => ({
-    type: ADD_EXPENSE,
-    name: expense.name,
-    price: expense.price,
-    category: expense.category,
-    date: expense.date,
-    id: nextTodoId++
-})
-
-export const removeExpense = (id) => {
-    return {
-        type: REMOVE_EXPENSE,
-        id
-    }
-}
 
 export const changeCategory = (category) => ({
     type: CATEGORY_CHANGE,
@@ -101,6 +85,31 @@ export const addExpenseAsync = (expense) => {
                     sheetName
                 }),
                 data: expense
+            }
+        });
+    }
+}
+
+export const removeExpenseAsync = (toRemove) => {
+    //TODO this should be calculated base on expense date
+    const sheetName = '03-2017-spendings';
+    //TODO this should be user prop in state
+    const spreadSheetId = '1kk2x5fZ6TyhX_o8nNKILEnuU2LZ4L3QGgeQTRBtXTfI';
+
+    return (dispatch, getState) => {
+        const { user: { token }, expenses: { list } } = getState();
+
+        const expenses = list.filter((expense) => expense.id !== toRemove);
+
+        dispatch({
+            type: REMOVE_EXPENSE_ASYNC,
+            payload: {
+                promise: replaceAllRows(expenses, {
+                    token,
+                    spreadSheetId,
+                    sheetName
+                }),
+                data: expenses
             }
         });
     }

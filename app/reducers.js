@@ -2,12 +2,11 @@ import {
     combineReducers
 } from 'redux';
 import {
-    ADD_EXPENSE,
-    REMOVE_EXPENSE,
     CATEGORY_CHANGE,
     USER_LOGIN,
     FETCH_SPREADSHEET_DATA,
-    ADD_EXPENSE_ASYNC
+    ADD_EXPENSE_ASYNC,
+    REMOVE_EXPENSE_ASYNC
 } from './constants';
 
 import {generateRandomInt} from './utils/random';
@@ -64,14 +63,22 @@ const expensesReducer = (expenses = initialState.expenses, action) => {
             loading: false
         }
 
-    case REMOVE_EXPENSE:
-        return Object.assign(
-            {},
-            expenses,
-            {
-                list: expenses.list.filter((expense) => (expense.id !== action.id))
-            }
-        );
+    case `${REMOVE_EXPENSE_ASYNC}_PENDING`:
+        return {
+            ...expenses,
+            loading: true,
+            list: action.payload
+        };
+    case `${REMOVE_EXPENSE_ASYNC}_FULFILLED`:
+        return {
+            ...expenses,
+            loading: false
+        };
+    case `${REMOVE_EXPENSE_ASYNC}_REJECTED`:
+        return {
+            ...expenses,
+            loading: false
+        }
 
     default:
         return expenses;

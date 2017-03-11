@@ -1,4 +1,4 @@
-import {serializeExpenses, serializeExpense} from '../serializers/googleSheetsSerializer';
+import {deserializeExpenses, serializeExpenses, serializeExpense} from '../serializers/googleSheetsSerializer';
 import {generateRandomInt} from '../utils/random';
 
 const existingSheets = [];
@@ -74,7 +74,7 @@ export function getAll({sheetName, ...requestProps}) {
                 return reject(response.status);
             })
             .then((data) => {
-                return resolve(serializeExpenses(data));
+                return resolve(deserializeExpenses(data));
             })
             .catch((err) => {
                 return reject(err);
@@ -105,6 +105,40 @@ export function addRow (expense, {sheetName, ...requestProps}) {
                });
    });
 }
+
+export function replaceAllRows (expenses, {sheetName, ...requestProps}) {
+    return new Promise((resolve, reject) => {
+        fetch(createRequest({
+            method: 'post',
+            path: `/values/${sheetName}!${range}:clear`,
+            ...requestProps
+        })).
+        then(() => fetch(createRequest({
+            method: 'post',
+            path: '/values:batchUpdate',
+            body: JSON.stringify({
+                data: {
+                    range: `${sheetName}!${range}`,
+                    values: serializeExpenses(expenses)
+                },
+                valueInputOption: "USER_ENTERED",
+                includeValuesInResponse: false
+            }),
+            ...requestProps
+        }))).
+        then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+
+            return reject(response);
+        }).
+        then((response) => resolve(expenses)).
+        catch((err) => {
+           reject(err);
+        });
+    });
+ }
 
 function buildCreateSheetRequest (properties) {
     return {
