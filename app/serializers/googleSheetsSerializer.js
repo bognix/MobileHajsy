@@ -1,9 +1,9 @@
 import {generateRandomInt} from '../utils/random';
 
 export const deserializeExpenses = (payload = {}) => {
-    const {values} = payload;
+    const { values }  = payload;
 
-    return values.map((entry) => {
+    return values ? values.map((entry) => {
         return {
             name: entry[0],
             price: entry[1],
@@ -11,7 +11,7 @@ export const deserializeExpenses = (payload = {}) => {
             date: entry[3],
             id: generateRandomInt()
         }
-    });
+    }) : [];
 }
 
 export const serializeExpense = (expense = {}) => ([destructExpense(expense)]);
