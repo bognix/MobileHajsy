@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from 'redux';
 import {mobileHajs} from './reducers';
-import ExpensesList from './containers/ExpensesList';
+import ExpensesContainer from './containers/ExpensesContainer';
 import ExpensesFilter from './containers/ExpensesFilter';
 import AddExpenseForm from './containers/AddExpenseForm';
 import {Navigation} from './containers/Navigation';
@@ -20,7 +20,7 @@ export const MobileHajs = () => (
     <View>
       <Navigation />
       <ExpensesFilter />
-      <ExpensesList />
+      <ExpensesContainer />
       <AddExpenseForm />
     </View>
   </Provider>

@@ -3,7 +3,8 @@ import {
     CATEGORY_CHANGE,
     FETCH_SPREADSHEET_DATA,
     ADD_EXPENSE_ASYNC,
-    REMOVE_EXPENSE_ASYNC
+    REMOVE_EXPENSE_ASYNC,
+    CHANGE_MONTH
 } from './constants';
 import {
     getAll,
@@ -11,6 +12,7 @@ import {
     replaceAllRows
 } from './services/GoogleSheets';
 import { GoogleSignIn } from './services/GoogleSignIn';
+import {getNextMonth, getPreviousMonth} from './services/dateService';
 
 export const changeCategory = (category) => ({
     type: CATEGORY_CHANGE,
@@ -112,5 +114,19 @@ export const removeExpenseAsync = (toRemove) => {
                 data: expenses
             }
         });
+    }
+}
+
+export const nextMonth = (monthYearDate) => {
+    return {
+        type: CHANGE_MONTH,
+        date: getNextMonth(monthYearDate)
+    };
+}
+
+export const previousMonth = (monthYearDate) => {
+    return {
+        type: CHANGE_MONTH,
+        date: getPreviousMonth(monthYearDate)
     }
 }

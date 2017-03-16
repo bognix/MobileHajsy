@@ -6,10 +6,12 @@ import {
     USER_LOGIN,
     FETCH_SPREADSHEET_DATA,
     ADD_EXPENSE_ASYNC,
-    REMOVE_EXPENSE_ASYNC
+    REMOVE_EXPENSE_ASYNC,
+    CHANGE_MONTH
 } from './constants';
 
 import {generateRandomInt} from './utils/random';
+import {getCurrentMonth} from './services/dateService';
 
 const initialState = {
     expenses: {
@@ -17,7 +19,8 @@ const initialState = {
         loading: false
     },
     user: {},
-    category: ''
+    category: '',
+    date: getCurrentMonth()
 }
 
 const expensesReducer = (expenses = initialState.expenses, action) => {
@@ -108,8 +111,18 @@ const userLoginReducer = (user = initialState.user, action) => {
     }
 }
 
+const dateReducer = (date = initialState.date, action) => {
+    switch (action.type) {
+        case CHANGE_MONTH:
+            return action.date;
+        default:
+            return date;
+    }
+}
+
 export const mobileHajs = combineReducers({
     expenses: expensesReducer,
     user: userLoginReducer,
-    category: categoryFilterReducer
+    category: categoryFilterReducer,
+    date: dateReducer
 });
