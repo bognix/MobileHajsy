@@ -2,7 +2,7 @@ export const getCurrentMonth = () => {
     return getMonthYear(new Date());
 }
 
-const getMonthYear = (dateObject) => {
+export const getMonthYear = (dateObject) => {
     return `${formatMonth(dateObject.getMonth())}-${dateObject.getFullYear()}`;
 }
 
@@ -19,7 +19,6 @@ const appendZero = (value) => {
 }
 
 const createDateBaseOnMothYear = (date) => {
-    console.log("*****",date);
     const dateArr = date.split('-');
 
     dateArr.splice(1, 0, '1');

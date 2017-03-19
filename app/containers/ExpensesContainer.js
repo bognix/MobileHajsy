@@ -1,14 +1,15 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {ExpensesContainer} from '../components/ExpensesContainer';
-import {nextMonth, previousMonth} from '../actions';
+import {fetchMonth} from '../actions';
+import {getNextMonth, getPreviousMonth} from '../services/dateService';
 
 const mapDispatchToProps = (dispatch) => ({
     onMonthForward: (date) => {
-        dispatch(nextMonth(date));
+        dispatch(fetchMonth(getNextMonth(date)));
     },
     onMonthBackward: (date) => {
-        dispatch(previousMonth(date));
+        dispatch(fetchMonth(getPreviousMonth(date)));
     }
 });
 

@@ -4,10 +4,9 @@ import {
 import {
     CATEGORY_CHANGE,
     USER_LOGIN,
-    FETCH_SPREADSHEET_DATA,
     ADD_EXPENSE_ASYNC,
     REMOVE_EXPENSE_ASYNC,
-    CHANGE_MONTH
+    FETCH_SPREADSHEET_DATA_FOR_MONTH
 } from './constants';
 
 import {generateRandomInt} from './utils/random';
@@ -25,17 +24,17 @@ const initialState = {
 
 const expensesReducer = (expenses = initialState.expenses, action) => {
     switch (action.type) {
-    case `${FETCH_SPREADSHEET_DATA}_PENDING`:
+    case `${FETCH_SPREADSHEET_DATA_FOR_MONTH}_PENDING`:
         return {
             loading: true,
             list: expenses.list
         }
-    case `${FETCH_SPREADSHEET_DATA}_FULFILLED`:
+    case `${FETCH_SPREADSHEET_DATA_FOR_MONTH}_FULFILLED`:
         return {
             loading: false,
             list: action.payload
         }
-    case `${FETCH_SPREADSHEET_DATA}_REJECTED`:
+    case `${FETCH_SPREADSHEET_DATA_FOR_MONTH}_REJECTED`:
         return {
             loading: false,
             list: []
@@ -113,8 +112,8 @@ const userLoginReducer = (user = initialState.user, action) => {
 
 const dateReducer = (date = initialState.date, action) => {
     switch (action.type) {
-        case CHANGE_MONTH:
-            return action.date;
+        case `${FETCH_SPREADSHEET_DATA_FOR_MONTH}_PENDING`:
+            return action.payload.date;
         default:
             return date;
     }
